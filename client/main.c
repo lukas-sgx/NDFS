@@ -51,8 +51,9 @@ int main(int argc, char const *argv[])
         bytes_read = recv(sock, buffer, BUFFER_SIZE - 1, 0);
         buffer[bytes_read] = '\0';
         if (strlen(buffer) > 0) {
+            const char *logo = "assets/zou.webp";
             notify_init("ZOU!");
-            NotifyNotification *notif = notify_notification_new("Transport Région Sud", "LUKAS -> BUS n°836", "dialog-information");
+            NotifyNotification *notif = notify_notification_new("Transport Région Sud", "LUKAS -> BUS n°836", logo);
 
             notify_notification_show(notif, NULL);
             g_object_unref(G_OBJECT(notif));
