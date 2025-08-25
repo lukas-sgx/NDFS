@@ -10,6 +10,7 @@
 #define PORT 8000
 #define CONNECTION_HOST "192.168.86.83"
 #define BUFFER_SIZE 1024
+#define PATH_MAX 200
 #define CLEAR_SCREEN() printf("\033[2J\033[H")
 
 int main(int argc, char const *argv[])
@@ -51,9 +52,16 @@ int main(int argc, char const *argv[])
         bytes_read = recv(sock, buffer, BUFFER_SIZE - 1, 0);
         buffer[bytes_read] = '\0';
         if (strlen(buffer) > 0) {
+            char cwd[PATH_MAX];
             const char *logo = "assets/zou.webp";
+
+            getcwd(cwd, sizeof(cwd));
+            snprintf(cwd, sizeof(cwd), "%s/%s", cwd, logo);
+
             notify_init("ZOU!");
             NotifyNotification *notif = notify_notification_new("Transport Région Sud", "LUKAS -> BUS n°836", logo);
+
+            notify_notification_set_category(notif, "transport.bus");
 
             notify_notification_show(notif, NULL);
             g_object_unref(G_OBJECT(notif));
