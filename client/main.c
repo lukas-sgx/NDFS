@@ -18,63 +18,71 @@ int main(int argc, char const *argv[])
 
     int sock, connectionStatus, bytes_read;
     char buffer[BUFFER_SIZE];
-    socklen_t serverAddrLength;
     struct sockaddr_in serverAddr;
+    socklen_t serverAddrLength = sizeof(serverAddr);
 
     sock = socket(AF_INET, SOCK_STREAM, 0);
+    if (sock < 0) { perror("socket"); exit(EXIT_FAILURE); }
 
     serverAddr.sin_family = AF_INET;
-    serverAddr.sin_port = htons(PORT);    
-    serverAddrLength = sizeof(serverAddr);
+    serverAddr.sin_port = htons(PORT);
 
     if (inet_pton(AF_INET, CONNECTION_HOST, &serverAddr.sin_addr) <= 0) {
         perror("inet_pton");
         exit(EXIT_FAILURE);
     }
 
-    connectionStatus = connect(sock, (struct sockaddr*) &serverAddr, serverAddrLength);
-
-    if(connectionStatus == -1){
-        fprintf(stderr, "(SERVER) Fail connect Server\n");
-        exit(1);
+    connectionStatus = connect(sock, (struct sockaddr*)&serverAddr, serverAddrLength);
+    if (connectionStatus == -1) {
+        perror("connect");
+        exit(EXIT_FAILURE);
     }
 
     printf("Connected to server %s:%d ✅\n", CONNECTION_HOST, PORT);
 
     snprintf(buffer, sizeof(buffer), "Hello World !!!");
-    send(sock, buffer, BUFFER_SIZE, 0);
+    send(sock, buffer, strlen(buffer), 0);
 
     snprintf(buffer, sizeof(buffer), "{notify: 'Bye Bye John'}");
-    send(sock, buffer, BUFFER_SIZE, 0);
+    send(sock, buffer, strlen(buffer), 0);
 
-    while (connectionStatus == 0){
+    char cwd[PATH_MAX];
+    
+    if (getcwd(cwd, sizeof(cwd)) == NULL) {
+        perror("getcwd");
+        exit(EXIT_FAILURE);
+    }
+
+    const char *logo = "assets/zou.webp";
+
+    char full_path[PATH_MAX];
+    int n = snprintf(full_path, sizeof(full_path), "%s/%s", cwd, logo);
+    if (n >= sizeof(full_path)) {
+        exit(EXIT_FAILURE);
+    }
+
+    printf("m: %s\n", full_path);
+
+    while (1) {
         bytes_read = recv(sock, buffer, BUFFER_SIZE - 1, 0);
+        if (bytes_read <= 0) break;
         buffer[bytes_read] = '\0';
+
         if (strlen(buffer) > 0) {
-            char cwd[PATH_MAX];
-            const char *logo = "assets/zou.webp";
-
-            char full_path[PATH_MAX];
-            strncpy(full_path, cwd, sizeof(full_path) - 1);
-            full_path[sizeof(full_path) - 1] = '\0';
-            strncat(full_path, "/", sizeof(full_path) - strlen(full_path) - 1);
-            strncat(full_path, logo, sizeof(full_path) - strlen(full_path) - 1);
-
             notify_init("ZOU!");
-            NotifyNotification *notif = notify_notification_new("Transport Région Sud", "LUKAS -> BUS n°836", logo);
 
-            notify_notification_set_category(notif, "transport.bus");
+            NotifyNotification *notif = notify_notification_new(
+                "Transport Région Sud",
+                "LUKAS -> BUS n°836",
+                full_path
+            );
 
             notify_notification_show(notif, NULL);
             g_object_unref(G_OBJECT(notif));
             notify_uninit();
         }
-
-    
     }
 
-    close(sock);    
-
+    close(sock);
     return 0;
 }
- 
