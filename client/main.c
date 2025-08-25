@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <limits.h>
 #include <libnotify/notify.h>
 
 #define PORT 8000
@@ -47,7 +48,7 @@ int main(int argc, char const *argv[])
     send(sock, buffer, strlen(buffer), 0);
 
     char cwd[PATH_MAX];
-    
+
     if (getcwd(cwd, sizeof(cwd)) == NULL) {
         perror("getcwd");
         exit(EXIT_FAILURE);
@@ -60,8 +61,6 @@ int main(int argc, char const *argv[])
     if (n >= sizeof(full_path)) {
         exit(EXIT_FAILURE);
     }
-
-    printf("m: %s\n", full_path);
 
     while (1) {
         bytes_read = recv(sock, buffer, BUFFER_SIZE - 1, 0);
