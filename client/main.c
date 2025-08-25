@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <libnotify/notify.h>
 
 #define PORT 8000
 #define CONNECTION_HOST "192.168.86.83"
@@ -15,18 +16,21 @@ int main(int argc, char const *argv[])
 {
     CLEAR_SCREEN();
 
-    int sock, inet, connectionStatus;
+    int sock, connectionStatus, bytes_read;
     char buffer[BUFFER_SIZE];
-    __u_long serverAddrLength;
+    socklen_t serverAddrLength;
     struct sockaddr_in serverAddr;
 
     sock = socket(AF_INET, SOCK_STREAM, 0);
 
     serverAddr.sin_family = AF_INET;
-    serverAddr.sin_port = PORT;    
+    serverAddr.sin_port = htons(PORT);    
     serverAddrLength = sizeof(serverAddr);
 
-    inet = inet_pton(AF_INET, CONNECTION_HOST, &serverAddr.sin_addr);
+    if (inet_pton(AF_INET, CONNECTION_HOST, &serverAddr.sin_addr) <= 0) {
+        perror("inet_pton");
+        exit(EXIT_FAILURE);
+    }
 
     connectionStatus = connect(sock, (struct sockaddr*) &serverAddr, serverAddrLength);
 
@@ -35,10 +39,27 @@ int main(int argc, char const *argv[])
         exit(1);
     }
 
-    printf("%u", connectionStatus);
+    printf("Connected to server %s:%d ✅\n", CONNECTION_HOST, PORT);
+
+    snprintf(buffer, sizeof(buffer), "Hello World !!!");
+    send(sock, buffer, BUFFER_SIZE, 0);
+
+    snprintf(buffer, sizeof(buffer), "{notify: 'Bye Bye John'}");
+    send(sock, buffer, BUFFER_SIZE, 0);
 
     while (connectionStatus == 0){
+        bytes_read = recv(sock, buffer, BUFFER_SIZE - 1, 0);
+        buffer[bytes_read] = '\0';
+        if (strlen(buffer) > 0) {
+            notify_init("Notif Test");
+            NotifyNotification *notif = notify_notification_new("Hello", "Coucou depuis C", "dialog-information");
 
+            notify_notification_show(notif, NULL);
+            g_object_unref(G_OBJECT(notif));
+            notify_uninit();
+        }
+
+    
     }
 
     close(sock);    

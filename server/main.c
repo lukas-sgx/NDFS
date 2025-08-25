@@ -21,9 +21,14 @@ void *client_handler(void *arg){
 
     while ((bytes_read = recv(client_sock, buffer, BUFFER_SIZE - 1, 0)) > 0) {
         buffer[bytes_read] = '\0';
-        printf("Client says: %s\n", buffer);
+        if (strlen(buffer) > 0) {
+            printf("Client says: %s\n", buffer);
+        }
 
-        send(client_sock, buffer, strlen(buffer), 0);
+
+        if(strstr(buffer, "{notify:")){
+            send(client_sock, buffer, strlen(buffer), 0);
+        }
     }
 
     printf("Client disconnected\n");
@@ -36,7 +41,7 @@ int main(int argc, char const *argv[])
     int server_sock, *new_sock;
     int sock, b;
     char buffer[BUFFER_SIZE];
-    __u_long serverAddrLength;
+    socklen_t serverAddrLength;
     struct sockaddr_in serverAddr, clientAddr;
 
     CLEAR_SCREEN();
@@ -44,7 +49,7 @@ int main(int argc, char const *argv[])
     sock = socket(AF_INET, SOCK_STREAM, 0);
 
     serverAddr.sin_family = AF_INET;
-    serverAddr.sin_port = PORT; 
+    serverAddr.sin_port = htons(PORT); 
     serverAddr.sin_addr.s_addr = INADDR_ANY;    
     serverAddrLength = sizeof(serverAddr);
 
@@ -67,7 +72,7 @@ int main(int argc, char const *argv[])
     {
         int connectedSocket = accept(sock, (struct sockaddr*) &serverAddr, (socklen_t *) &serverAddrLength);
 
-        printf("New connection from %s:%d\n",
+        printf("New victim from %s:%d 👤\n",
                inet_ntoa(clientAddr.sin_addr), ntohs(clientAddr.sin_port));
         
         pthread_t thread_id;

@@ -1,4 +1,7 @@
 CC       = gcc
+CFLAGS = -Wall -g
+PKGFLAGS = $(shell pkg-config --cflags --libs libnotify)
+
 OUTPUT   = build
 
 SRCS_SERVER = server/main.c
@@ -14,10 +17,10 @@ build_dir:
 	@mkdir -p $(OUTPUT)
 
 $(SERVER): $(SRCS_SERVER)
-	@echo "Compiling NTDFS -> SERVER 🛠️" && $(CC) $< -o $@
+	@echo "Compiling NTDFS -> SERVER 🛠️" && $(CC) $(CFLAGS) $< -o $@ $(PKGFLAGS)
 
 $(CLIENT): $(SRCS_CLIENT)
-	@echo "Compiling NTDFS -> CLIENT 🛠️" && $(CC) $< -o $@
+	@echo "Compiling NTDFS -> CLIENT 🛠️" && $(CC) $(CFLAGS) $< -o $@ $(PKGFLAGS)
 
 run-server: $(SERVER)
 	@echo "🚀 Launch Server 👤" && ./$(SERVER)
