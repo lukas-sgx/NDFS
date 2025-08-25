@@ -35,8 +35,10 @@ int main(int argc, char const *argv[])
         exit(1);
     }
 
-    while (connectionStatus > 0){
-        
+    printf("%u", connectionStatus);
+
+    while (connectionStatus == 0){
+
     }
 
     close(sock);    

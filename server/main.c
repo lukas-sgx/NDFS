@@ -12,10 +12,28 @@
 #define MAX_LENGTH_QUEUE 2
 #define CLEAR_SCREEN() printf("\033[2J\033[H")
 
+void *client_handler(void *arg){
+    int client_sock = *(int *)arg;
+    free(arg);
 
+    char buffer[BUFFER_SIZE];
+    int bytes_read;
+
+    while ((bytes_read = recv(client_sock, buffer, BUFFER_SIZE - 1, 0)) > 0) {
+        buffer[bytes_read] = '\0';
+        printf("Client says: %s\n", buffer);
+
+        send(client_sock, buffer, strlen(buffer), 0);
+    }
+
+    printf("Client disconnected\n");
+    close(client_sock);
+    return NULL;
+}
 
 int main(int argc, char const *argv[])
 {
+    int server_sock, *new_sock;
     int sock, b;
     char buffer[BUFFER_SIZE];
     __u_long serverAddrLength;
@@ -52,6 +70,17 @@ int main(int argc, char const *argv[])
         printf("New connection from %s:%d\n",
                inet_ntoa(clientAddr.sin_addr), ntohs(clientAddr.sin_port));
         
+        pthread_t thread_id;
+        new_sock = malloc(sizeof(int));
+        *new_sock = connectedSocket;
+
+        if (pthread_create(&thread_id, NULL, client_handler, new_sock) != 0) {
+            perror("pthread_create");
+            close(connectedSocket);
+            free(new_sock);
+        }
+
+        pthread_detach(thread_id);
     }
 
     close(sock);
