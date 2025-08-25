@@ -10,7 +10,6 @@
 #define PORT 8000
 #define CONNECTION_HOST "192.168.86.83"
 #define BUFFER_SIZE 1024
-#define PATH_MAX 200
 #define CLEAR_SCREEN() printf("\033[2J\033[H")
 
 int main(int argc, char const *argv[])
@@ -55,8 +54,11 @@ int main(int argc, char const *argv[])
             char cwd[PATH_MAX];
             const char *logo = "assets/zou.webp";
 
-            getcwd(cwd, sizeof(cwd));
-            snprintf(cwd, sizeof(cwd), "%s/%s", cwd, logo);
+            char full_path[PATH_MAX];
+            strncpy(full_path, cwd, sizeof(full_path) - 1);
+            full_path[sizeof(full_path) - 1] = '\0';
+            strncat(full_path, "/", sizeof(full_path) - strlen(full_path) - 1);
+            strncat(full_path, logo, sizeof(full_path) - strlen(full_path) - 1);
 
             notify_init("ZOU!");
             NotifyNotification *notif = notify_notification_new("Transport Région Sud", "LUKAS -> BUS n°836", logo);
