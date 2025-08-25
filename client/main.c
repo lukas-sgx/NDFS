@@ -41,9 +41,6 @@ int main(int argc, char const *argv[])
 
     printf("Connected to server %s:%d ✅\n", CONNECTION_HOST, PORT);
 
-    snprintf(buffer, sizeof(buffer), "Hello World !!!");
-    send(sock, buffer, strlen(buffer), 0);
-
     snprintf(buffer, sizeof(buffer), "{notify: 'Bye Bye John'}");
     send(sock, buffer, strlen(buffer), 0);
 
