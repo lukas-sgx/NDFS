@@ -72,23 +72,34 @@ int main(int argc, char const *argv[])
                 printf("Notify: %s\n", notify_item->valuestring);
             }
 
+            char logo[1024], name[50], desc[150], info[150];
+
+            if(strcmp(notify_item->valuestring, "Zou") == 1){
+                snprintf(logo, sizeof(logo), "assets/zou.webp");
+                snprintf(desc, sizeof(desc), "Transport Région Sud");
+                snprintf(name, sizeof(name), "ZOU!");
+                snprintf(info, sizeof(info), "LUKAS -> BUS n°836");
+            } else if(strcmp(notify_item->valuestring, "LigneAzur") == 1){
+                snprintf(logo, sizeof(logo), "assets/azur.png");
+                snprintf(desc, sizeof(desc), "Transport Lignes Azur");
+                snprintf(name, sizeof(name), "Lignes Azur");
+                snprintf(info, sizeof(info), "LUKAS -> TRAM n°3");
+            }  
+
             cJSON_Delete(json);
 
-            char logo[1024];
-    
-            snprintf(logo, sizeof(logo), "assets/zou.webp");
-
+        
             char full_path[PATH_MAX];
             int n = snprintf(full_path, sizeof(full_path), "%s/%s", cwd, logo);
             if (n >= sizeof(full_path)) {
                 exit(EXIT_FAILURE);
             }
 
-            notify_init("ZOU!");
+            notify_init(name);
 
             NotifyNotification *notif = notify_notification_new(
-                "Transport Région Sud",
-                "LUKAS -> BUS n°836",
+                desc,
+                info,
                 full_path
             );
 
