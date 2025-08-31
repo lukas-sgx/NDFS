@@ -74,12 +74,12 @@ int main(int argc, char const *argv[])
 
             char logo[1024], name[50], desc[150], info[150];
 
-            if(strcmp(notify_item->valuestring, "Zou") == 1){
+            if(strcmp(notify_item->valuestring, "Zou")){
                 snprintf(logo, sizeof(logo), "assets/zou.webp");
                 snprintf(desc, sizeof(desc), "Transport Région Sud");
                 snprintf(name, sizeof(name), "ZOU!");
                 snprintf(info, sizeof(info), "LUKAS -> BUS n°836");
-            } else if(strcmp(notify_item->valuestring, "LigneAzur") == 1){
+            } else if(strcmp(notify_item->valuestring, "LigneAzur")){
                 snprintf(logo, sizeof(logo), "assets/azur.png");
                 snprintf(desc, sizeof(desc), "Transport Lignes Azur");
                 snprintf(name, sizeof(name), "Lignes Azur");
