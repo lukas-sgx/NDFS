@@ -68,9 +68,6 @@ int main(int argc, char const *argv[])
             }
 
             cJSON *notify_item = cJSON_GetObjectItemCaseSensitive(json, "notify");
-            if (cJSON_IsString(notify_item) && (notify_item->valuestring != NULL)) {
-                printf("Notify: %s\n", notify_item->valuestring);
-            }
 
             char logo[1024], name[50], desc[150], info[150];
 
@@ -89,7 +86,17 @@ int main(int argc, char const *argv[])
                 snprintf(desc, sizeof(desc), "Bikepark Isola 2000");
                 snprintf(name, sizeof(name), "Isola");
                 snprintf(info, sizeof(info), "LUKAS -> Jungle Speed 🔴");
-            }  
+            } else if(strcmp(notify_item->valuestring, "Oyster") == 0){
+                snprintf(logo, sizeof(logo), "assets/oyster.gif");
+                snprintf(desc, sizeof(desc), "Underground London");
+                snprintf(name, sizeof(name), "Oyster");
+                snprintf(info, sizeof(info), "LUKAS -> UNDERGROUND n°5");
+            } else if(strcmp(notify_item->valuestring, "Worklife") == 0){
+                snprintf(logo, sizeof(logo), "assets/worklife.webp");
+                snprintf(desc, sizeof(desc), "Card to pay");
+                snprintf(name, sizeof(name), "Worklife");
+                snprintf(info, sizeof(info), "LUKAS -> TICKET");
+            }   
         
             char full_path[PATH_MAX];
             int n = snprintf(full_path, sizeof(full_path), "%s/%s", cwd, logo);
