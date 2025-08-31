@@ -7,6 +7,7 @@
 #include <unistd.h>
 #include <limits.h>
 #include <libnotify/notify.h>
+#include "../src/cJSON.h"
 
 #define PORT 8000
 #define CONNECTION_HOST "192.168.86.83"
@@ -41,9 +42,6 @@ int main(int argc, char const *argv[])
 
     printf("Connected to server %s:%d ✅\n", CONNECTION_HOST, PORT);
 
-    snprintf(buffer, sizeof(buffer), "{notify: 'Bye Bye John'}");
-    send(sock, buffer, strlen(buffer), 0);
-
     char cwd[PATH_MAX];
 
     if (getcwd(cwd, sizeof(cwd)) == NULL) {
@@ -51,13 +49,7 @@ int main(int argc, char const *argv[])
         exit(EXIT_FAILURE);
     }
 
-    const char *logo = "assets/zou.webp";
 
-    char full_path[PATH_MAX];
-    int n = snprintf(full_path, sizeof(full_path), "%s/%s", cwd, logo);
-    if (n >= sizeof(full_path)) {
-        exit(EXIT_FAILURE);
-    }
 
     while (1) {
         bytes_read = recv(sock, buffer, BUFFER_SIZE - 1, 0);
@@ -65,6 +57,33 @@ int main(int argc, char const *argv[])
         buffer[bytes_read] = '\0';
 
         if (strlen(buffer) > 0) {
+
+            cJSON *json = cJSON_Parse(buffer);
+            if (json == NULL) {
+                const char *error_ptr = cJSON_GetErrorPtr();
+                if   (error_ptr != NULL) {
+                    printf("Error: %s\n", error_ptr);
+                }
+                return 1;
+            }
+
+            cJSON *notify_item = cJSON_GetObjectItemCaseSensitive(json, "notify");
+            if (cJSON_IsString(notify_item) && (notify_item->valuestring != NULL)) {
+                printf("Notify: %s\n", notify_item->valuestring);
+            }
+
+            cJSON_Delete(json);
+
+            char logo[1024];
+    
+            snprintf(logo, sizeof(logo), "assets/zou.webp");
+
+            char full_path[PATH_MAX];
+            int n = snprintf(full_path, sizeof(full_path), "%s/%s", cwd, logo);
+            if (n >= sizeof(full_path)) {
+                exit(EXIT_FAILURE);
+            }
+
             notify_init("ZOU!");
 
             NotifyNotification *notif = notify_notification_new(
@@ -76,6 +95,7 @@ int main(int argc, char const *argv[])
             notify_notification_show(notif, NULL);
             g_object_unref(G_OBJECT(notif));
             notify_uninit();
+            cJSON_Delete(json);
         }
     }
 

@@ -4,8 +4,8 @@ PKGFLAGS = $(shell pkg-config --cflags --libs libnotify)
 
 OUTPUT   = build
 
-SRCS_SERVER = server/main.c
-SRCS_CLIENT = client/main.c
+SRCS_SERVER = server/main.c src/cJSON.c
+SRCS_CLIENT = client/main.c src/cJSON.c
 
 SERVER   = $(OUTPUT)/server
 CLIENT   = $(OUTPUT)/client
@@ -17,10 +17,10 @@ build_dir:
 	@mkdir -p $(OUTPUT)
 
 $(SERVER): $(SRCS_SERVER)
-	@echo "Compiling NTDFS -> SERVER 🛠️" && $(CC) $(CFLAGS) $< -o $@ $(PKGFLAGS)
+	@echo "Compiling NTDFS -> SERVER 🛠️" && $(CC) $(CFLAGS) $^ -o $@ $(PKGFLAGS)
 
 $(CLIENT): $(SRCS_CLIENT)
-	@echo "Compiling NTDFS -> CLIENT 🛠️" && $(CC) $(CFLAGS) $< -o $@ $(PKGFLAGS)
+	@echo "Compiling NTDFS -> CLIENT 🛠️" && $(CC) $(CFLAGS) $^ -o $@ $(PKGFLAGS)
 
 run-server: $(SERVER)
 	@echo "🚀 Launch Server 👤" && ./$(SERVER)
