@@ -74,20 +74,22 @@ int main(int argc, char const *argv[])
 
             char logo[1024], name[50], desc[150], info[150];
 
-            if(strcmp(notify_item->valuestring, "Zou")){
+            if(strcmp(notify_item->valuestring, "Zou") == 0){
                 snprintf(logo, sizeof(logo), "assets/zou.webp");
                 snprintf(desc, sizeof(desc), "Transport Région Sud");
                 snprintf(name, sizeof(name), "ZOU!");
                 snprintf(info, sizeof(info), "LUKAS -> BUS n°836");
-            } else if(strcmp(notify_item->valuestring, "LigneAzur")){
+            } else if(strcmp(notify_item->valuestring, "LigneAzur") == 0){
                 snprintf(logo, sizeof(logo), "assets/azur.png");
                 snprintf(desc, sizeof(desc), "Transport Lignes Azur");
                 snprintf(name, sizeof(name), "Lignes Azur");
                 snprintf(info, sizeof(info), "LUKAS -> TRAM n°3");
+            } else if(strcmp(notify_item->valuestring, "Isola") == 0){
+                snprintf(logo, sizeof(logo), "assets/isola2000.png");
+                snprintf(desc, sizeof(desc), "Bikepark Isola 2000");
+                snprintf(name, sizeof(name), "Isola");
+                snprintf(info, sizeof(info), "LUKAS -> Jungle Speed 🔴");
             }  
-
-            cJSON_Delete(json);
-
         
             char full_path[PATH_MAX];
             int n = snprintf(full_path, sizeof(full_path), "%s/%s", cwd, logo);
